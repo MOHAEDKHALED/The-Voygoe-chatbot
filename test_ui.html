@@ -1,0 +1,205 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Voyago Chatbot Test UI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root{--bg:#0d1117;--surface:#161b22;--s2:#21262d;--border:#30363d;--accent:#58a6ff;--green:#3fb950;--red:#f85149;--yellow:#e3b341;--text:#e6edf3;--muted:#8b949e}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Cairo,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+    header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    .logo{width:40px;height:40px;background:linear-gradient(135deg,#58a6ff,#3fb950);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;margin-left:12px}
+    .htitle h1{font-size:17px;font-weight:700}
+    .htitle p{font-size:11px;color:var(--muted)}
+    .hrow{display:flex;align-items:center}
+    #statusBadge{display:flex;align-items:center;gap:6px;background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.3);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--green);font-weight:600}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+    .quickbar{background:var(--surface);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;gap:7px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+    .quickbar::-webkit-scrollbar{display:none}
+    .qlabel{font-size:11px;color:var(--muted);align-self:center;flex-shrink:0}
+    .qbtn{flex-shrink:0;background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:16px;padding:5px 12px;font-size:11px;font-family:Cairo,sans-serif;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .qbtn:hover{background:var(--accent);border-color:var(--accent);color:#fff;transform:translateY(-1px)}
+    .qbtn.emg{border-color:var(--red);color:var(--red)}
+    .qbtn.emg:hover{background:var(--red);color:#fff}
+    .chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+    .row{display:flex;gap:9px;animation:up .3s ease}
+    @keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .row.usr{flex-direction:row-reverse}
+    .av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;align-self:flex-end}
+    .av.bot{background:rgba(88,166,255,.08);border:1px solid var(--border)}
+    .av.usr{background:#1f4068;border:1px solid #2d5a8e}
+    .bbl{max-width:72%;padding:11px 14px;border-radius:12px;line-height:1.7;font-size:13px}
+    .bbl.bot{background:var(--s2);border:1px solid var(--border);border-bottom-right-radius:3px}
+    .bbl.usr{background:#1f4068;border:1px solid #2d5a8e;border-bottom-left-radius:3px;text-align:right}
+    .bbl.emg{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.35);border-bottom-right-radius:3px}
+    .bbl.fall{background:rgba(227,179,65,.07);border:1px solid rgba(227,179,65,.3);border-bottom-right-radius:3px}
+    .badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 8px;border-radius:8px;margin-bottom:7px;font-weight:600}
+    .b-h{background:rgba(88,166,255,.12);color:#58a6ff;border:1px solid rgba(88,166,255,.25)}
+    .b-a{background:rgba(163,113,247,.12);color:#a371f7;border:1px solid rgba(163,113,247,.25)}
+    .b-r{background:rgba(255,166,77,.12);color:#ffa64d;border:1px solid rgba(255,166,77,.25)}
+    .b-g{background:rgba(63,185,80,.12);color:#3fb950;border:1px solid rgba(63,185,80,.25)}
+    .b-e{background:rgba(248,81,73,.12);color:#f85149;border:1px solid rgba(248,81,73,.25)}
+    .b-f{background:rgba(227,179,65,.12);color:#e3b341;border:1px solid rgba(227,179,65,.25)}
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:8px;margin-top:9px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px;transition:all .2s;cursor:pointer}
+    .card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 14px rgba(88,166,255,.12)}
+    .cname{font-size:12px;font-weight:600;margin-bottom:5px}
+    .cmeta{font-size:10px;color:var(--muted);display:flex;gap:5px;align-items:center}
+    .crat{color:var(--yellow);font-weight:700}
+    .clink{display:block;margin-top:7px;font-size:10px;color:var(--accent);text-decoration:none;font-weight:600}
+    .enums{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+    .enum{background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.3);border-radius:7px;padding:5px 11px;font-size:12px;font-weight:700;color:var(--red)}
+    .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+    .chip{background:var(--s2);border:1px solid var(--border);border-radius:14px;padding:4px 10px;font-size:11px;color:var(--muted);cursor:pointer;transition:all .2s}
+    .chip:hover{border-color:var(--accent);color:var(--accent)}
+    .tdots{display:flex;gap:4px;padding:12px 14px;align-items:center}
+    .tdot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:bounce 1.4s infinite}
+    .tdot:nth-child(2){animation-delay:.2s}
+    .tdot:nth-child(3){animation-delay:.4s}
+    @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-7px);opacity:1}}
+    .ibar{background:var(--surface);border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:8px;align-items:center;flex-shrink:0}
+    .lsel{background:var(--s2);border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:7px 9px;font-size:12px;font-family:Cairo,sans-serif;cursor:pointer;outline:none}
+    .lsel:focus{border-color:var(--accent)}
+    .inp{flex:1;background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:9px 14px;font-size:13px;font-family:Cairo,sans-serif;outline:none;direction:auto;transition:border-color .2s}
+    .inp:focus{border-color:var(--accent)}
+    .inp::placeholder{color:var(--muted)}
+    .sbtn{background:linear-gradient(135deg,#58a6ff,#3fb950);border:none;color:#fff;border-radius:9px;padding:9px 18px;font-size:15px;cursor:pointer;font-family:Cairo,sans-serif;font-weight:700;transition:all .2s}
+    .sbtn:hover{transform:scale(1.04);box-shadow:0 4px 14px rgba(88,166,255,.35)}
+    .sbtn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .welcome{text-align:center;padding:40px 20px;color:var(--muted)}
+    .welcome .wi{font-size:52px;margin-bottom:10px}
+    .welcome h2{font-size:19px;color:var(--text);margin-bottom:7px;font-weight:700}
+    .welcome p{font-size:12px;line-height:1.9}
+    .jtog{font-size:10px;color:var(--muted);cursor:pointer;margin-top:5px;display:inline-block}
+    .jtog:hover{color:var(--accent)}
+    .jbox{background:#0d1117;border:1px solid var(--border);border-radius:7px;padding:8px;margin-top:5px;font-size:10px;color:#adbac7;white-space:pre-wrap;word-break:break-all;display:none;direction:ltr;text-align:left;max-height:180px;overflow-y:auto}
+    ::-webkit-scrollbar{width:4px;height:4px}
+    ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+  </style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <div class="logo">V</div>
+    <div class="htitle">
+      <h1>Voyago Chatbot</h1>
+      <p>Test UI — localhost:8000</p>
+    </div>
+  </div>
+  <div id="statusBadge"><div class="dot"></div><span id="stxt">جاري الاتصال...</span></div>
+</header>
+<div class="quickbar">
+  <span class="qlabel">اختبار سريع:</span>
+  <button class="qbtn" onclick="qs('عايز فندق في الفيوم','ar')">🏨 فندق AR</button>
+  <button class="qbtn" onclick="qs('hotel in fayoum','en')">🏨 Hotel EN</button>
+  <button class="qbtn" onclick="qs('عايز مطعم حلو','ar')">🍔 مطعم AR</button>
+  <button class="qbtn" onclick="qs('best restaurant fayoum','en')">🍔 Restaurant EN</button>
+  <button class="qbtn" onclick="qs('عايز أزور معالم الفيوم','ar')">🏛️ معالم AR</button>
+  <button class="qbtn" onclick="qs('tourist attractions fayoum','en')">🏛️ Attractions EN</button>
+  <button class="qbtn" onclick="qs('عايز مرشد سياحي','ar')">🧭 مرشد AR</button>
+  <button class="qbtn" onclick="qs('tour guide please','en')">🧭 Guide EN</button>
+  <button class="qbtn emg" onclick="qs('محتاج إسعاف الآن','ar')">🚨 طوارئ AR</button>
+  <button class="qbtn emg" onclick="qs('I need an ambulance now','en')">🚨 Emergency EN</button>
+  <button class="qbtn" onclick="qs('كلام مش مفهوم خالص','ar')">❓ Fallback AR</button>
+  <button class="qbtn" onclick="qs('xyz random nonsense','en')">❓ Fallback EN</button>
+</div>
+<div class="chat" id="chat">
+  <div class="welcome" id="wlc">
+    <div class="wi">🗺️</div>
+    <h2>Voyago Chatbot Test UI</h2>
+    <p>اضغط زر من الأعلى أو اكتب في الأسفل<br/>السيرفر على <strong>localhost:8000</strong></p>
+  </div>
+</div>
+<div class="ibar">
+  <select class="lsel" id="lang">
+    <option value="auto">🌐 Auto</option>
+    <option value="ar">🇪🇬 عربي</option>
+    <option value="en">🇺🇸 English</option>
+  </select>
+  <input class="inp" id="inp" placeholder="اكتب رسالتك هنا..." onkeydown="if(event.key==='Enter')send()" />
+  <button class="sbtn" id="sbtn" onclick="send()">إرسال ↑</button>
+</div>
+<script>
+const API='http://localhost:8000';
+let sid='test_'+Date.now(),mc=0;
+window.addEventListener('load',async()=>{
+  try{const r=await fetch(API+'/health');const d=await r.json();
+    document.getElementById('stxt').textContent='متصل ✓ — '+d.model;
+  }catch{
+    document.getElementById('stxt').textContent='غير متصل ✗';
+    const b=document.getElementById('statusBadge');
+    b.style.background='rgba(248,81,73,.1)';b.style.borderColor='rgba(248,81,73,.3)';
+    document.querySelector('.dot').style.background='#f85149';
+    document.getElementById('stxt').style.color='#f85149';
+  }
+});
+function qs(m,l){document.getElementById('inp').value=m;document.getElementById('lang').value=l;send();}
+async function send(){
+  const inp=document.getElementById('inp'),l=document.getElementById('lang').value,m=inp.value.trim();
+  if(!m)return;
+  const wlc=document.getElementById('wlc');if(wlc)wlc.remove();
+  inp.value='';document.getElementById('sbtn').disabled=true;
+  addUser(m);const tid=typing();
+  try{
+    const r=await fetch(API+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:m,session_id:sid,language:l})});
+    const d=await r.json();rmTyping(tid);addBot(d);
+  }catch(e){rmTyping(tid);addErr('تعذر الاتصال: '+API);}
+  finally{document.getElementById('sbtn').disabled=false;inp.focus();}
+}
+function addUser(m){
+  const c=document.getElementById('chat'),row=document.createElement('div');
+  row.className='row usr';
+  row.innerHTML='<div class="av usr">👤</div><div class="bbl usr">'+esc(m)+'</div>';
+  c.appendChild(row);sb();
+}
+function addBot(d){
+  const c=document.getElementById('chat'),row=document.createElement('div');
+  row.className='row';mc++;
+  let bc='bot';if(d.type==='emergency')bc='emg';if(d.type==='fallback')bc='fall';
+  const jid='j'+mc;
+  row.innerHTML='<div class="av bot">🤖</div><div class="bbl '+bc+'">'+ibadge(d.intent,d.type)+'<div>'+fmt(d.message)+'</div>'+body(d)+'<div class="jtog" onclick="tj(\''+jid+'\')">{ } JSON</div><pre class="jbox" id="'+jid+'">'+esc(JSON.stringify(d,null,2))+'</pre></div>';
+  c.appendChild(row);
+  row.querySelectorAll('.chip').forEach(ch=>ch.addEventListener('click',()=>{document.getElementById('inp').value=ch.textContent;send();}));
+  sb();
+}
+function ibadge(intent,type){
+  const m={fayoum_hotels:['b-h','🏨','Hotels'],fayoum_attractions:['b-a','🏛️','Attractions'],fayoum_restaurants:['b-r','🍔','Restaurants'],fayoum_tourguides:['b-g','🧭','Guides'],fayoum_emergency:['b-e','🚨','Emergency'],unknown:['b-f','❓','Fallback']};
+  const[cls,ic,lb]=m[intent]||['b-f','💬',intent];
+  return '<div class="badge '+cls+'">'+ic+' '+lb+' <span style="opacity:.6;font-weight:400">· '+type+'</span></div>';
+}
+function body(d){
+  if(!d.data)return'';
+  if(d.data.items&&d.data.items.length){
+    return'<div class="cards">'+d.data.items.map(i=>'<div class="card" onclick="window.open(\''+i.link+'\',\'_blank\')"><div class="cname">'+esc(i.name||'—')+'</div><div class="cmeta">'+(i.rating?'<span class="crat">⭐ '+i.rating+'</span>':'')+'</div>'+(i.link?'<span class="clink">فتح ↗</span>':'')+'</div>').join('')+'</div>';
+  }
+  if(d.data.numbers){
+    const n=d.data.numbers;
+    return'<div class="enums"><div class="enum">🚔 شرطة: '+n.police+'</div><div class="enum">🚑 إسعاف: '+n.ambulance+'</div><div class="enum">🚒 مطافئ: '+n.fire+'</div></div>'+(d.data.nearest_hospital?'<div style="margin-top:7px;font-size:11px;color:var(--muted)">🏥 '+d.data.nearest_hospital+'</div>':'');
+  }
+  if(d.data.suggestions&&d.data.suggestions.length){
+    return'<div class="chips">'+d.data.suggestions.map(s=>'<span class="chip">'+esc(s)+'</span>').join('')+'</div>';
+  }
+  return'';
+}
+function typing(){
+  const id='t'+Date.now(),c=document.getElementById('chat'),row=document.createElement('div');
+  row.className='row';row.id=id;
+  row.innerHTML='<div class="av bot">🤖</div><div class="bbl bot"><div class="tdots"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div></div>';
+  c.appendChild(row);sb();return id;
+}
+function rmTyping(id){const e=document.getElementById(id);if(e)e.remove();}
+function addErr(m){
+  const c=document.getElementById('chat'),row=document.createElement('div');
+  row.className='row';
+  row.innerHTML='<div class="av bot">⚠️</div><div class="bbl emg" style="font-size:12px;">'+esc(m)+'</div>';
+  c.appendChild(row);sb();
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmt(s){return esc(s||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n/g,'<br/>');}
+function tj(id){const e=document.getElementById(id);e.style.display=e.style.display==='block'?'none':'block';}
+function sb(){const c=document.getElementById('chat');c.scrollTop=c.scrollHeight;}
+</script>
+</body>
+</html>

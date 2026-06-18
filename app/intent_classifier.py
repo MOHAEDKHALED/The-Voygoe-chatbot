@@ -86,20 +86,49 @@ class IntentClassifier:
         normalized = self.normalize(text)
         tokens = set(normalized.split())
 
-        # Rule-based overrides for fast-path high-accuracy intents
-        restaurant_keywords = {"مطعم", "مطاعم", "اكل", "جوعان", "كافيه", "كافيهات", "restaurant", "restaurants", "food", "eat", "hungry", "cafe", "cafes"}
-        if tokens & restaurant_keywords:
-            return "fayoum_restaurants", 1.0
+        # ── Rule-based overrides: natural conversational Arabic & English ────
 
-        tourguide_keywords = {"مرشد", "مرشدين", "تورجايد", "تور جايد", "دليل", "tourguide", "tour guides", "guide", "guides"}
-        if (tokens & tourguide_keywords) or "tour guide" in normalized or "مرشد سياحي" in normalized:
-            return "fayoum_tourguides", 1.0
-
-        hotel_keywords = {"فندق", "فنادق", "hotel", "hotels", "اقامه"}
+        # Hotels — حجز / إقامة / نوم
+        hotel_keywords = {
+            "فندق", "فنادق", "hotel", "hotels", "اقامه", "اقامة",
+            "احجز", "حجز", "حجزت", "انام", "بيت", "شاليه", "ريزورت",
+            "resort", "lodge", "inn", "book", "booking", "room", "stay",
+            "اسكن", "مبيت", "ليله", "غرفه", "غرفة"
+        }
         if tokens & hotel_keywords:
             return "fayoum_hotels", 1.0
 
-        attraction_keywords = {"معالم", "معلم", "مزار", "مزارات", "attraction", "attractions", "sightseeing"}
+        # Restaurants — أكل / جوع / كافيه
+        restaurant_keywords = {
+            "مطعم", "مطاعم", "اكل", "جوعان", "كافيه", "كافيهات",
+            "restaurant", "restaurants", "food", "eat", "hungry", "cafe", "cafes",
+            "اكلات", "مطبخ", "وجبه", "وجبة", "فطار", "غدا", "عشا",
+            "breakfast", "lunch", "dinner", "meal", "عايز ياكل", "اكل حلو",
+            "مطعم حلو", "اكل كويس", "اكل زين", "بيتزا", "كشري", "فول",
+            "شاورما", "مشاوي", "سمك", "fish", "grill", "pizza"
+        }
+        if tokens & restaurant_keywords:
+            return "fayoum_restaurants", 1.0
+
+        # Tour Guides — مرشد / دليل / جولة
+        tourguide_keywords = {
+            "مرشد", "مرشدين", "تورجايد", "دليل", "tourguide", "guide", "guides",
+            "جوله", "جولة", "tour", "tours", "يرشدني", "يدلني", "يصحبني",
+            "معاي", "برنامج سياحي", "خطة رحله", "trip plan", "local guide"
+        }
+        if (tokens & tourguide_keywords) or "tour guide" in normalized or "مرشد سياحي" in normalized:
+            return "fayoum_tourguides", 1.0
+
+        # Attractions — أماكن / مزارات / تجوال
+        attraction_keywords = {
+            "معالم", "معلم", "مزار", "مزارات", "attraction", "attractions", "sightseeing",
+            "أزور", "ازور", "اتفرج", "تفرج", "اتجول", "تجول", "اشوف", "شوف",
+            "visit", "see", "explore", "اماكن", "مكان", "اماكن حلوه",
+            "بحيره", "بحيرة", "وادي", "قصر", "هرم", "نهر", "شلال",
+            "lake", "valley", "pyramid", "museum", "park", "nature", "طبيعه",
+            "رحله", "رحلة", "سياحه", "سياحة", "تاريخ", "historic", "جميل",
+            "وادي الريان", "بحيرة قارون", "قارون", "وادي الحيتان"
+        }
         if tokens & attraction_keywords:
             return "fayoum_attractions", 1.0
 

@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     RESTAURANTS_ENDPOINT: str = "/Restaurants"
     TOURGUIDES_ENDPOINT: str = "/TourGuides"
 
+    # ── Gemini AI ─────────────────────────────────────────────────────────
+    GEMINI_API_KEY: str = ""  # Get free key: https://aistudio.google.com/apikey
+
     # ── CORS ──────────────────────────────────────────────────────────────
     ALLOWED_ORIGINS: List[str] = ["*"]   # change to your domain in production
 
